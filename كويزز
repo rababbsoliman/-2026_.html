@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>سباق الرياضيات - البحث عن الكنز</title>
+  <style>
+    :root {
+      --bg1: #0f172a;
+      --bg2: #1e293b;
+      --card: rgba(255,255,255,.9);
+      --primary: #2563eb;
+      --secondary: #ef4444;
+      --accent: #16a34a;
+      --warning: #f59e0b;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --shadow: 0 14px 30px rgba(15, 23, 42, .2);
+      --radius: 22px;
+      --road: #475569;
+      --building-1: #f59e0b;
+      --building-2: #60a5fa;
+      --building-3: #34d399;
+      --window: rgba(255,255,255,.85);
+      --sand: #f5d08a;
+      --gold: #fbbf24;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Tahoma", "Arial", sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 18%, rgba(255,255,255,.08), transparent 15%),
+        radial-gradient(circle at 80% 10%, rgba(255,215,0,.10), transparent 18%),
+        linear-gradient(180deg, #0f172a 0%, #1e3a5f 28%, #355c7d 48%, #6aa6b8 66%, #d8b36a 83%, #f0d7a1 100%);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 8% 82%, rgba(34,197,94,.15), transparent 10%),
+        radial-gradient(circle at 18% 80%, rgba(34,197,94,.13), transparent 9%),
+        radial-gradient(circle at 84% 84%, rgba(59,130,246,.18), transparent 14%),
+        linear-gradient(90deg, transparent 0 7%, rgba(255,255,255,.05) 7% 7.4%, transparent 7.4% 16%, rgba(255,255,255,.04) 16% 16.4%, transparent 16.4% 100%);
+      pointer-events: none;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 24vh;
+      background:
+        linear-gradient(180deg, transparent, rgba(245,208,138,.15) 25%, rgba(240,215,161,.75) 100%),
+        radial-gradient(circle at 15% 65%, rgba(34,197,94,.2), transparent 12%),
+        radial-gradient(circle at 35% 85%, rgba(245,158,11,.2), transparent 12%),
+        radial-gradient(circle at 72% 80%, rgba(59,130,246,.22), transparent 13%),
+        radial-gradient(circle at 88% 72%, rgba(34,197,94,.16), transparent 10%);
+      pointer-events: none;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 22px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .title-card,
+    .panel,
+    .track-card,
+    .footer-note {
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,.45);
+    }
+
+    .title-card {
+      padding: 24px;
+      margin-bottom: 18px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.93), rgba(255,251,235,.90));
+    }
+
+    .title-card::before {
+      content: "";
+      position: absolute;
+      inset: auto -5% -10px -5%;
+      height: 120px;
+      background:
+        radial-gradient(circle at 12% 70%, rgba(59,130,246,.25), transparent 18%),
+        radial-gradient(circle at 25% 60%, rgba(245,158,11,.25), transparent 15%),
+        radial-gradient(circle at 42% 70%, rgba(34,197,94,.22), transparent 14%),
+        radial-gradient(circle at 58% 56%, rgba(245,158,11,.24), transparent 15%),
+        radial-gradient(circle at 72% 72%, rgba(59,130,246,.22), transparent 18%),
+        radial-gradient(circle at 88% 66%, rgba(34,197,94,.2), transparent 14%);
+      opacity: .95;
+      pointer-events: none;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 44px);
+      color: #0f172a;
+      position: relative;
+      z-index: 1;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #334155;
+      font-size: 18px;
+      line-height: 1.8;
+      position: relative;
+      z-index: 1;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+    }
+
+    .track-card,
+    .panel { padding: 18px; }
+
+    .section-title {
+      font-size: 24px;
+      margin: 0 0 14px;
+      color: #111827;
+    }
+
+    .track-card {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 84% 18%, rgba(255,255,255,.18), transparent 12%),
+        linear-gradient(180deg, #16324f 0%, #27567d 28%, #4b8ea8 48%, #7bc1c8 58%, #b9d49a 72%, #dcbc7a 86%, #efd8a7 100%);
+      min-height: 620px;
+    }
+
+    .track-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 12% 82%, rgba(34,197,94,.34), transparent 11%),
+        radial-gradient(circle at 20% 80%, rgba(34,197,94,.22), transparent 8%),
+        radial-gradient(circle at 31% 78%, rgba(245,158,11,.24), transparent 10%),
+        radial-gradient(circle at 78% 83%, rgba(59,130,246,.28), transparent 16%),
+        radial-gradient(circle at 80% 23%, rgba(255,255,255,.20), transparent 10%),
+        linear-gradient(135deg, transparent 0 18%, rgba(71,85,105,.55) 18% 20%, transparent 20% 38%, rgba(71,85,105,.55) 38% 40%, transparent 40% 57%, rgba(71,85,105,.55) 57% 59%, transparent 59% 100%);
+      pointer-events: none;
+      opacity: .85;
+    }
+
+    .track-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, transparent 0 10%, rgba(255,255,255,.15) 10% 10.7%, transparent 10.7% 100%),
+        radial-gradient(circle at 62% 26%, rgba(255,215,0,.22), transparent 9%),
+        radial-gradient(circle at 66% 28%, rgba(255,215,0,.18), transparent 5%);
+      pointer-events: none;
+    }
+
+    .track {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      direction: ltr;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cell {
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,251,235,.95));
+      min-height: 112px;
+      border: 3px solid rgba(255,255,255,.55);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 22px;
+      transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+      overflow: hidden;
+      box-shadow: 0 10px 18px rgba(15,23,42,.10);
+    }
+
+    .cell::before {
+      content: "";
+      position: absolute;
+      inset: 8px 8px auto 8px;
+      height: 44px;
+      border-radius: 12px;
+      background:
+        linear-gradient(90deg,
+          #b45309 0 11%, transparent 11% 14%,
+          #f59e0b 14% 26%, transparent 26% 30%,
+          #2563eb 30% 44%, transparent 44% 48%,
+          #16a34a 48% 62%, transparent 62% 66%,
+          #f59e0b 66% 78%, transparent 78% 82%,
+          #2563eb 82% 100%);
+      opacity: .65;
+    }
+
+    .cell::after {
+      content: "";
+      position: absolute;
+      inset: auto 10px 12px 10px;
+      height: 13px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent 0 8%, #64748b 8% 92%, transparent 92% 100%);
+      opacity: .5;
+    }
+
+    .cell.special-plus {
+      background: linear-gradient(180deg, #ecfdf5, #d1fae5);
+      border-color: #86efac;
+      box-shadow: 0 10px 22px rgba(34,197,94,.16);
+    }
+
+    .cell.special-minus {
+      background: linear-gradient(180deg, #fff7ed, #ffedd5);
+      border-color: #fdba74;
+      box-shadow: 0 10px 22px rgba(249,115,22,.16);
+    }
+
+    .cell.finish {
+      background: linear-gradient(180deg, #fff7cc, #fde68a);
+      border-color: #fbbf24;
+      box-shadow: 0 12px 24px rgba(251,191,36,.25);
+    }
+
+    .cell.active-turn {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 14px 24px rgba(37, 99, 235, .16);
+    }
+
+    .cell-number {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      font-size: 16px;
+      color: #475569;
+      direction: ltr;
+      z-index: 2;
+      background: rgba(255,255,255,.72);
+      border-radius: 999px;
+      padding: 4px 8px;
+    }
+
+    .cell-label {
+      font-size: 14px;
+      color: #0f172a;
+      position: absolute;
+      bottom: 28px;
+      right: 10px;
+      left: 10px;
+      text-align: center;
+      z-index: 2;
+      background: rgba(255,255,255,.82);
+      border-radius: 999px;
+      padding: 4px 8px;
+    }
+
+    .players {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding-top: 12px;
+      z-index: 3;
+    }
+
+    .token {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: 0 6px 12px rgba(0,0,0,.16);
+      position: relative;
+    }
+
+    .token::after {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.3);
+    }
+
+    .p1 { background: var(--primary); }
+    .p2 { background: var(--secondary); }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.82);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+      border: 1px solid rgba(148,163,184,.22);
+    }
+
+    .dot { width: 16px; height: 16px; border-radius: 50%; }
+    .dot.plus { background: #22c55e; }
+    .dot.minus { background: #fb923c; }
+    .dot.p1 { background: var(--primary); }
+    .dot.p2 { background: var(--secondary); }
+
+    .top-status {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .status-card {
+      background: #f8fafc;
+      border-radius: 18px;
+      padding: 14px;
+      border: 2px solid transparent;
+    }
+
+    .status-card.active {
+      border-color: #bfdbfe;
+      background: #eff6ff;
+    }
+
+    .status-name {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .status-pos {
+      text-align: center;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 16px;
+      direction: ltr;
+    }
+
+    .question-box {
+      background: linear-gradient(180deg, #fefce8, #fff7ed);
+      border: 2px dashed #f59e0b;
+      border-radius: 20px;
+      padding: 18px;
+      margin: 14px 0;
+    }
+
+    .question-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      font-size: 15px;
+      color: #7c2d12;
+    }
+
+    .math-line {
+      direction: ltr;
+      text-align: center;
+      font-size: clamp(28px, 4vw, 38px);
+      font-weight: 700;
+      margin: 10px 0 4px;
+      background: rgba(255,255,255,.78);
+      border-radius: 16px;
+      padding: 14px;
+      letter-spacing: .3px;
+      min-height: 88px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .prompt-ar {
+      text-align: center;
+      color: #92400e;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      transition: transform .15s ease, opacity .2s ease, box-shadow .2s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+
+    .answer-btn,
+    .control-btn {
+      border-radius: 16px;
+      padding: 14px 12px;
+      font-size: 20px;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+    }
+
+    .answer-btn {
+      background: #ffffff;
+      border: 2px solid #e5e7eb;
+      direction: ltr;
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .answer-btn.correct { background: #dcfce7; border-color: #22c55e; }
+    .answer-btn.wrong { background: #fee2e2; border-color: #ef4444; }
+
+    .control-btn.primary { background: var(--primary); color: white; }
+    .control-btn.secondary { background: #e5e7eb; color: #111827; }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      justify-content: center;
+    }
+
+    .message {
+      margin-top: 14px;
+      min-height: 58px;
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      background: #f8fafc;
+    }
+
+    .message.success { background: #dcfce7; color: #166534; }
+    .message.error { background: #fee2e2; color: #991b1b; }
+    .message.info { background: #eff6ff; color: #1d4ed8; }
+
+    .timer-wrap { margin-top: 14px; }
+    .timer-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      direction: ltr;
+    }
+
+    .timer-bar {
+      height: 14px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .timer-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
+      transition: width 1s linear;
+    }
+
+    .topic-list {
+      margin-top: 16px;
+      background: #f8fafc;
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .topic-list h3 { margin: 0 0 10px; font-size: 18px; }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      padding: 14px 18px;
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.8;
+      background: rgba(255,255,255,.88);
+    }
+
+    .winner-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 10;
+    }
+
+    .winner-overlay.show { display: flex; }
+
+    .winner-card {
+      background: white;
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      width: min(540px, 100%);
+      text-align: center;
+    }
+
+    .winner-card h2 { margin-top: 0; font-size: 34px; }
+    .winner-card p { font-size: 20px; color: var(--muted); line-height: 1.8; }
+
+    .fraction {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      vertical-align: middle;
+      line-height: 1;
+      margin: 0 2px;
+    }
+
+    .fraction .top,
+    .fraction .bottom {
+      display: block;
+      padding: 0 8px;
+      text-align: center;
+      font-variant-numeric: lining-nums;
+    }
+
+    .fraction .top { padding-bottom: 5px; }
+    .fraction .bottom { padding-top: 5px; }
+    .fraction .bar {
+      display: block;
+      width: 100%;
+      min-width: 30px;
+      border-top: 3px solid currentColor;
+    }
+
+    .inline-sign {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .answers { grid-template-columns: 1fr; }
+      .track { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @media (max-width: 560px) {
+      .track { grid-template-columns: repeat(3, 1fr); }
+      .top-status { grid-template-columns: 1fr; }
+      .cell { min-height: 92px; }
+      .math-line { font-size: 24px; min-height: 78px; }
+      .fraction .bar { min-width: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="title-card">
+      <h1>سباق الرياضيات - البحث عن الكنز</h1>
+      <p class="subtitle">مغامرة رياضيات داخل مدينة كنوز مليانة طرق وأسواق وأبراج وميناء وحدائق، واللاعب الذي يجيب بسرعة وصحة يتقدم أولًا حتى يصل إلى الكنز قبل الآخر.</p>
+    </section>
+
+    <div class="layout">
+      <section class="track-card">
+        <h2 class="section-title">خريطة مدينة الكنز</h2>
+        <div id="track" class="track"></div>
+        <div class="legend">
+          <div class="legend-item"><span class="dot p1"></span> المستكشف 1</div>
+          <div class="legend-item"><span class="dot p2"></span> المستكشف 2</div>
+          <div class="legend-item"><span class="dot plus"></span> طريق سريع +2</div>
+          <div class="legend-item"><span class="dot minus"></span> عائق أو حراسة -1</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="section-title">دور اللعب</h2>
+
+        <div class="top-status">
+          <div id="player1Card" class="status-card active">
+            <div class="status-name"><span class="dot p1"></span> المستكشف 1</div>
+            <div class="status-pos">الموضع: <span id="p1Pos">1</span></div>
+          </div>
+          <div id="player2Card" class="status-card">
+            <div class="status-name"><span class="dot p2"></span> المستكشف 2</div>
+            <div class="status-pos">الموضع: <span id="p2Pos">1</span></div>
+          </div>
+        </div>
+
+        <div class="question-box">
+          <div class="question-meta">
+            <span>الدور الحالي: <strong id="turnText">المستكشف 1</strong></span>
+            <span>المهارة: <strong id="skillText">-</strong></span>
+          </div>
+          <div class="prompt-ar">اختَر الإجابة الصحيحة لتقترب من الكنز</div>
+          <div id="mathLine" class="math-line"></div>
+          <div id="answers" class="answers"></div>
+
+          <div class="timer-wrap">
+            <div class="timer-label">
+              <span>Time</span>
+              <span><span id="timeValue">15</span>s</span>
+            </div>
+            <div class="timer-bar">
+              <div id="timerFill" class="timer-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="message" class="message info">ابدئي اللعبة واضغطي على الإجابة المناسبة.</div>
+
+        <div class="controls">
+          <button id="newQuestionBtn" class="control-btn primary">سؤال جديد</button>
+          <button id="restartBtn" class="control-btn secondary">إعادة اللعبة</button>
+        </div>
+
+        <div class="topic-list">
+          <h3>المهارات الموجودة داخل اللعبة</h3>
+          <div class="chips">
+            <span class="chip">الكسور المتكافئة</span>
+            <span class="chip">مقارنة الكسور المختلفة المقامات</span>
+            <span class="chip">جمع وطرح كسور متحدة المقام</span>
+            <span class="chip">جمع عدد كلي مع كسر</span>
+            <span class="chip">تحويل كسر إلى عدد عشري</span>
+            <span class="chip">تحويل عدد عشري إلى كسر</span>
+            <span class="chip">ترتيب الكسور تصاعديًا وتنازليًا</span>
+            <span class="chip">مقارنة الأعداد العشرية حتى الجزء من مائة</span>
+            <span class="chip">مسائل لفظية قصيرة</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="footer-note">
+      ملاحظة: تم تطوير اللعبة لتكون رحلة بحث عن الكنز داخل مدينة مليئة بالتفاصيل، مع رفع مستوى الأسئلة ليشمل مهارات أعمق قليلًا ومناسبة لمراجعة أقوى للصف الرابع.
+    </section>
+  </div>
+
+  <div id="winnerOverlay" class="winner-overlay">
+    <div class="winner-card">
+      <h2 id="winnerTitle">أحسنت!</h2>
+      <p id="winnerText">فاز اللاعب 1 بالسباق.</p>
+      <button id="playAgainBtn" class="control-btn primary">العب مرة أخرى</button>
+    </div>
+  </div>
+
+  <script>
+    const totalCells = 20;
+    const bonusCells = [5, 11, 17];
+    const penaltyCells = [8, 14];
+    const trackEl = document.getElementById('track');
+    const p1PosEl = document.getElementById('p1Pos');
+    const p2PosEl = document.getElementById('p2Pos');
+    const player1Card = document.getElementById('player1Card');
+    const player2Card = document.getElementById('player2Card');
+    const turnText = document.getElementById('turnText');
+    const skillText = document.getElementById('skillText');
+    const mathLine = document.getElementById('mathLine');
+    const answersEl = document.getElementById('answers');
+    const messageEl = document.getElementById('message');
+    const newQuestionBtn = document.getElementById('newQuestionBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const playAgainBtn = document.getElementById('playAgainBtn');
+    const winnerOverlay = document.getElementById('winnerOverlay');
+    const winnerTitle = document.getElementById('winnerTitle');
+    const winnerText = document.getElementById('winnerText');
+    const timerFill = document.getElementById('timerFill');
+    const timeValue = document.getElementById('timeValue');
+
+    const game = {
+      currentPlayer: 1,
+      positions: { 1: 1, 2: 1 },
+      currentQuestion: null,
+      locked: false,
+      timeLeft: 15,
+      timerId: null,
+      finished: false,
+    };
+
+    function rand(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function gcd(a, b) {
+      while (b !== 0) {
+        [a, b] = [b, a % b];
+      }
+      return a;
+    }
+
+    function simplifyFraction(n, d) {
+      const g = gcd(n, d);
+      return { n: n / g, d: d / g };
+    }
+
+    function fracText(n, d) {
+      return `${n}/${d}`;
+    }
+
+    function fracHTML(n, d) {
+      return `<span class="fraction"><span class="top">${n}</span><span class="bar"></span><span class="bottom">${d}</span></span>`;
+    }
+
+    function compareSymbol(a, b) {
+      if (a > b) return '>';
+      if (a < b) return '<';
+      return '=';
+    }
+
+    function escapeHTML(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function uniqueChoices(correct, extraGenerator) {
+      const set = new Set([correct]);
+      while (set.size < 4) {
+        set.add(extraGenerator());
+      }
+      return shuffle([...set]);
+    }
+
+    function qEquivalentFractions() {
+      const baseD = rand(2, 9);
+      const baseN = rand(1, baseD - 1);
+      const factor = rand(2, 4);
+      const eqN = baseN * factor;
+      const eqD = baseD * factor;
+      const correct = fracText(eqN, eqD);
+      const choices = uniqueChoices(correct, () => {
+        const f = rand(2, 5);
+        const adjust = rand(1, 3);
+        return fracText(baseN * f + adjust, baseD * f);
+      });
+      return {
+        skill: 'الكسور المتكافئة',
+        promptHTML: `${fracHTML(baseN, baseD)} <span class="inline-sign">=</span> <span class="inline-sign">?</span>`,
+        correct,
+        choices,
+      };
+    }
+
+    function qCompareCommonFractions() {
+      let d1 = rand(2, 9);
+      let d2 = rand(2, 9);
+      while (d1 === d2) d2 = rand(2, 9);
+      const n1 = rand(1, d1 - 1);
+      const n2 = rand(1, d2 - 1);
+      const correct = compareSymbol(n1 / d1, n2 / d2);
+      const baseChoices = ['>', '<', '='];
+      const choices = shuffle([...baseChoices, baseChoices[rand(0, 2)]]);
+      return {
+        skill: 'مقارنة الكسور المختلفة المقامات',
+        promptHTML: `${fracHTML(n1, d1)} <span class="inline-sign">?</span> ${fracHTML(n2, d2)}`,
+        correct,
+        choices,
+      };
+    }
+
+    function qAddSameDenominator() {
+      const d = rand(3, 10);
+      const a = rand(1, d - 1);
+      const b = rand(1, d - a);
+      const sum = simplifyFraction(a + b, d);
+      const correct = fracText(sum.n, sum.d);
+      const choices = uniqueChoices(correct, () => {
+        const n = Math.max(1, a + b + rand(-2, 2));
+        return fracText(n, d);
+      });
+      return {
+        skill: 'جمع كسور متحدة المقام',
+        promptHTML: `${fracHTML(a, d)} <span class="inline-sign">+</span> ${fracHTML(b, d)} <span class="inline-sign">=</span> <span class="inline-sign">?</span>`,
+        correct,
+        choices,
+      };
+    }
+
+    function qSubtractSameDenominator() {
+      const d = rand(3, 10);
+      const a = rand(2, d - 1);
+      const b = rand(1, a - 1);
+      const diff = simplifyFraction(a - b, d);
+      const correct = fracText(diff.n, diff.d);
+      const choices = uniqueChoices(correct, () => {
+        const n = Math.max(1, (a - b) + rand(-2, 2));
+        return fracText(n, d);
+      });
+      return {
+        skill: 'طرح كسور متحدة المقام',
+        promptHTML: `${fracHTML(a, d)} <span class="inline-sign">−</span> ${fracHTML(b, d)} <span class="inline-sign">=</span> <span class="inline-sign">?</span>`,
+        correct,
+        choices,
+      };
+    }
+
+    function qCompareDecimals() {
+      const a = (rand(1, 9) / 10 + rand(0, 9) / 100).toFixed(2);
+      const b = (rand(1, 9) / 10 + rand(0, 9) / 100).toFixed(2);
+      const correct = compareSymbol(Number(a), Number(b));
+      const choices = shuffle(['>', '<', '=', rand(0, 1) ? '>' : '<']);
+      return {
+        skill: 'مقارنة الأعداد العشرية',
+        promptHTML: `<span>${a}</span> <span class="inline-sign">?</span> <span>${b}</span>`,
+        correct,
+        choices,
+      };
+    }
+
+    function qDecimalFractionMatch() {
+      const tenths = rand(1, 9);
+      const correct = fracText(tenths, 10);
+      const choices = uniqueChoices(correct, () => {
+        const n = rand(1, 9);
+        return fracText(n, 10);
+      });
+      return {
+        skill: 'الكسور العشرية',
+        promptHTML: `<span>${(tenths / 10).toFixed(1)}</span> <span class="inline-sign">=</span> <span class="inline-sign">?</span>`,
+        correct,
+        choices,
+      };
+    }
+
+    function qReadSimpleFraction() {
+      const d = rand(2, 10);
+      const n = rand(1, d - 1);
+      const correct = fracText(n, d);
+      const choices = uniqueChoices(correct, () => fracText(rand(1, 9), d));
+      return {
+        skill: 'تمييز الكسر المناسب',
+        promptHTML: `<span>اختر الكسر الذي يمثل ${n} من ${d}</span>`,
+        correct,
+        choices,
+      };
+    }
+
+    function qWholePlusFraction() {
+      const whole = rand(1, 4);
+      const d = rand(2, 8);
+      const n = rand(1, d - 1);
+      const totalN = whole * d + n;
+      const s = simplifyFraction(totalN, d);
+      const correct = fracText(s.n, s.d);
+      const choices = uniqueChoices(correct, () => {
+        const delta = rand(-2, 2);
+        return fracText(Math.max(1, totalN + delta), d);
+      });
+      return {
+        skill: 'جمع عدد كلي مع كسر',
+        promptHTML: `<span>${whole}</span> <span class="inline-sign">+</span> ${fracHTML(n, d)} <span class="inline-sign">=</span> <span class="inline-sign">?</span>`,
+        correct,
+        choices,
+      };
+    }
+
+    function qFractionToDecimal() {
+      const pairs = [[1,2],[1,4],[3,4],[1,5],[2,5],[3,5],[4,5],[1,10],[3,10],[7,10],[25,100],[75,100]];
+      const [n,d] = pairs[rand(0, pairs.length - 1)];
+      const correct = (n / d).toFixed(d === 100 ? 2 : (String(n / d).includes('.') ? String(n / d).split('.')[1].length : 0));
+      const choices = uniqueChoices(correct, () => (Math.max(0, (n / d) + (rand(-2,2) / 10))).toFixed(correct.includes('.') ? correct.split('.')[1].length : 1));
+      return {
+        skill: 'تحويل كسر إلى عدد عشري',
+        promptHTML: `${fracHTML(n, d)} <span class="inline-sign">=</span> <span class="inline-sign">?</span>`,
+        correct,
+        choices,
+      };
+    }
+
+    function qOrderFractions() {
+      const d = rand(4, 8);
+      let nums = shuffle([1, 2, 3, 4].map(x => Math.min(x, d - 1))).slice(0, 3);
+      nums = [...new Set(nums)].sort((a,b) => a-b);
+      while (nums.length < 3) {
+        const x = rand(1, d - 1);
+        if (!nums.includes(x)) nums.push(x);
+        nums.sort((a,b)=>a-b);
+      }
+      const correct = nums.map(n => fracText(n, d)).join(' < ');
+      const wrong1 = `${fracText(nums[1], d)} < ${fracText(nums[0], d)} < ${fracText(nums[2], d)}`;
+      const wrong2 = `${fracText(nums[2], d)} < ${fracText(nums[1], d)} < ${fracText(nums[0], d)}`;
+      const wrong3 = `${fracText(nums[0], d)} < ${fracText(nums[2], d)} < ${fracText(nums[1], d)}`;
+      return {
+        skill: 'ترتيب الكسور تصاعديًا',
+        promptHTML: `<span>رتب تصاعديًا:</span> ${fracHTML(nums[0], d)} ، ${fracHTML(nums[1], d)} ، ${fracHTML(nums[2], d)}`,
+        correct,
+        choices: shuffle([correct, wrong1, wrong2, wrong3]),
+      };
+    }
+
+    function qWordProblem() {
+      const d = rand(4, 8);
+      const a = rand(1, d - 2);
+      const b = rand(1, d - a - 1);
+      const total = simplifyFraction(a + b, d);
+      const correct = fracText(total.n, total.d);
+      const choices = uniqueChoices(correct, () => fracText(rand(1, d - 1), d));
+      return {
+        skill: 'مسألة لفظية قصيرة',
+        promptHTML: `<span style="direction:rtl;text-align:center;line-height:1.7">أكلت مريم ${fracHTML(a, d)} من الشطيرة ثم أكلت ${fracHTML(b, d)} أخرى. كم أكلت في المجموع؟</span>`,
+        correct,
+        choices,
+      };
+    }
+
+    const questionFactories = [
+      qEquivalentFractions,
+      qCompareCommonFractions,
+      qAddSameDenominator,
+      qSubtractSameDenominator,
+      qCompareDecimals,
+      qDecimalFractionMatch,
+      qReadSimpleFraction,
+      qWholePlusFraction,
+      qFractionToDecimal,
+      qOrderFractions,
+      qWordProblem,
+    ];
+
+    function formatChoiceHTML(choice) {
+      if (/^\d+\/\d+$/.test(choice)) {
+        const [n, d] = choice.split('/').map(Number);
+        return fracHTML(n, d);
+      }
+      return `<span>${escapeHTML(choice)}</span>`;
+    }
+
+    function generateQuestion() {
+      const factory = questionFactories[rand(0, questionFactories.length - 1)];
+      return factory();
+    }
+
+    function renderTrack() {
+      trackEl.innerHTML = '';
+      for (let i = 1; i <= totalCells; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        if (bonusCells.includes(i)) cell.classList.add('special-plus');
+        if (penaltyCells.includes(i)) cell.classList.add('special-minus');
+        if (i === totalCells) cell.classList.add('finish');
+        if (i === game.positions[game.currentPlayer]) cell.classList.add('active-turn');
+
+        const num = document.createElement('div');
+        num.className = 'cell-number';
+        num.textContent = i;
+        cell.appendChild(num);
+
+        const players = document.createElement('div');
+        players.className = 'players';
+        if (game.positions[1] === i) {
+          const t1 = document.createElement('div');
+          t1.className = 'token p1';
+          players.appendChild(t1);
+        }
+        if (game.positions[2] === i) {
+          const t2 = document.createElement('div');
+          t2.className = 'token p2';
+          players.appendChild(t2);
+        }
+        cell.appendChild(players);
+
+        if (bonusCells.includes(i) || penaltyCells.includes(i) || i === totalCells) {
+          const label = document.createElement('div');
+          label.className = 'cell-label';
+          label.textContent = i === totalCells ? 'الكنز' : bonusCells.includes(i) ? 'طريق سريع +2' : 'حراسة -1';
+          cell.appendChild(label);
+        }
+
+        trackEl.appendChild(cell);
+      }
+    }
+
+    function updateStatus() {
+      p1PosEl.textContent = game.positions[1];
+      p2PosEl.textContent = game.positions[2];
+      turnText.textContent = `المستكشف ${game.currentPlayer}`;
+      player1Card.classList.toggle('active', game.currentPlayer === 1);
+      player2Card.classList.toggle('active', game.currentPlayer === 2);
+      renderTrack();
+    }
+
+    function setMessage(text, type = 'info') {
+      messageEl.textContent = text;
+      messageEl.className = `message ${type}`;
+    }
+
+    function renderQuestion() {
+      if (game.finished) return;
+      game.currentQuestion = generateQuestion();
+      skillText.textContent = game.currentQuestion.skill;
+      mathLine.innerHTML = game.currentQuestion.promptHTML;
+      answersEl.innerHTML = '';
+      game.currentQuestion.choices.forEach(choice => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.dataset.value = choice;
+        btn.innerHTML = formatChoiceHTML(choice);
+        btn.addEventListener('click', () => handleAnswer(choice, btn));
+        answersEl.appendChild(btn);
+      });
+      setMessage(`دور المستكشف ${game.currentPlayer}. أجب بسرعة وصحة لتقترب من الكنز قبل اللاعب الآخر.`, 'info');
+      startTimer();
+    }
+
+    function startTimer() {
+      clearInterval(game.timerId);
+      game.timeLeft = 30;
+      timeValue.textContent = game.timeLeft;
+      timerFill.style.width = '100%';
+      game.timerId = setInterval(() => {
+        game.timeLeft -= 1;
+        timeValue.textContent = game.timeLeft;
+        timerFill.style.width = `${(game.timeLeft / 30) * 100}%`;
+        if (game.timeLeft <= 0) {
+          clearInterval(game.timerId);
+          if (!game.locked) {
+            timeOutTurn();
+          }
+        }
+      }, 1000);
+    }
+
+    function timeOutTurn() {
+      game.locked = true;
+      disableAnswers();
+      setMessage(`انتهى الوقت! ينتقل الدور إلى المستكشف ${game.currentPlayer === 1 ? 2 : 1}.`, 'error');
+      setTimeout(() => {
+        nextTurn();
+      }, 1400);
+    }
+
+    function disableAnswers() {
+      [...answersEl.querySelectorAll('button')].forEach(btn => btn.disabled = true);
+    }
+
+    function handleAnswer(choice, clickedBtn) {
+      if (game.locked || game.finished) return;
+      game.locked = true;
+      clearInterval(game.timerId);
+      disableAnswers();
+
+      const correct = choice === game.currentQuestion.correct;
+      [...answersEl.querySelectorAll('button')].forEach(btn => {
+        if (btn.dataset.value === game.currentQuestion.correct) btn.classList.add('correct');
+        else if (btn === clickedBtn) btn.classList.add('wrong');
+      });
+
+      if (correct) {
+        movePlayer(game.currentPlayer, 2);
+        let msg = `إجابة صحيحة! تقدم المستكشف ${game.currentPlayer} خطوتين نحو الكنز.`;
+
+        const pos = game.positions[game.currentPlayer];
+        if (bonusCells.includes(pos)) {
+          movePlayer(game.currentPlayer, 2);
+          msg += ' ووجد طريقًا سريعًا +2!';
+        } else if (penaltyCells.includes(pos)) {
+          movePlayer(game.currentPlayer, -1);
+          msg += ' لكن واجه حراسة أعادته خطوة واحدة.';
+        }
+
+        updateStatus();
+
+        if (checkWinner()) {
+          return;
+        }
+
+        setMessage(msg, 'success');
+      } else {
+        setMessage(`إجابة غير صحيحة. الإجابة الصحيحة هي ${game.currentQuestion.correct}. والكنز ما زال بعيدًا قليلًا.`, 'error');
+      }
+
+      setTimeout(() => {
+        nextTurn();
+      }, 1700);
+    }
+
+    function movePlayer(player, steps) {
+      game.positions[player] += steps;
+      if (game.positions[player] < 1) game.positions[player] = 1;
+      if (game.positions[player] > totalCells) game.positions[player] = totalCells;
+    }
+
+    function nextTurn() {
+      game.currentPlayer = game.currentPlayer === 1 ? 2 : 1;
+      game.locked = false;
+      updateStatus();
+      renderQuestion();
+    }
+
+    function checkWinner() {
+      if (game.positions[game.currentPlayer] >= totalCells) {
+        game.finished = true;
+        clearInterval(game.timerId);
+        winnerTitle.textContent = '🎉 ممتاز!';
+        winnerText.textContent = `فاز المستكشف ${game.currentPlayer} ووصل إلى الكنز أولًا!`;
+        winnerOverlay.classList.add('show');
+        setMessage(`فاز اللاعب ${game.currentPlayer}!`, 'success');
+        return true;
+      }
+      return false;
+    }
+
+    function restartGame() {
+      clearInterval(game.timerId);
+      game.currentPlayer = 1;
+      game.positions = { 1: 1, 2: 1 };
+      game.currentQuestion = null;
+      game.locked = false;
+      game.timeLeft = 30;
+      game.finished = false;
+      winnerOverlay.classList.remove('show');
+      updateStatus();
+      renderQuestion();
+    }
+
+    newQuestionBtn.addEventListener('click', () => {
+      if (game.finished || game.locked) return;
+      renderQuestion();
+    });
+
+    restartBtn.addEventListener('click', restartGame);
+    playAgainBtn.addEventListener('click', restartGame);
+
+    updateStatus();
+    renderQuestion();
+  </script>
+</body>
+</html>
